@@ -1,0 +1,69 @@
+import React, { useState, useEffect } from 'react';
+
+const UpdateDrugPage = () => {
+  const { id } = useParams();
+  const [formData, setFormData] = useState({ id: '', name: '', quantity: '' });
+  const [originalData, setOriginalData] = useState({ id: '', name: '', quantity: '' });
+
+  useEffect(() => {
+    // Replace 'yourApiEndpoint' with your actual API endpoint
+    axios.get(`yourApiEndpoint/${id}`)
+      .then(response => {
+        const data = response.data;
+        setFormData(data);
+        setOriginalData(data);
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  }, [id]);
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
+  const handleFormSubmit = () => {
+    // Only submit fields that are different from the original data
+    const updatedFields = Object.keys(formData).filter(key => formData[key] !== originalData[key]);
+    const updatedData = Object.fromEntries(updatedFields.map(key => [key, formData[key]]));
+
+    // Send updatedData to the backend API for processing
+    // ...
+
+    // Optionally, you can update the original data to reflect the changes
+    setOriginalData({ ...originalData, ...updatedData });
+  };
+
+  return (
+    <div>
+      <h2>Update Drug</h2>
+      <form>
+        <label>
+          Name:
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleFormChange}
+          />
+        </label>
+        <label>
+          Quantity:
+          <input
+            type="text"
+            name="quantity"
+            value={formData.quantity}
+            onChange={handleFormChange}
+          />
+        </label>
+        <button type="button" onClick={handleFormSubmit}>
+          Update
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default UpdateDrugPage;
